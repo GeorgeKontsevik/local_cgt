@@ -54,7 +54,7 @@ class CityProvision(BaseMethod):
         self.nx_graph = city_model.MobilityGraph
         self.buildings = city_model.Buildings.copy(deep=True)
 
-        print(self.buildings)
+        # print(self.buildings)
 
         self.buildings = self.buildings.dropna(subset="id")
         self.buildings["id"] = self.buildings["id"].astype(int)
@@ -94,8 +94,8 @@ class CityProvision(BaseMethod):
         self.buildings = self.buildings.merge(
             self.demands, left_on=["id"], right_on=["id"], how="left"
         )
-        print(self.demands)
-        print(self.buildings)
+        # print(self.demands)
+        # print(self.buildings)
         # except:
         # self.errors.append(service_type)
         for service_type in service_types:
@@ -134,8 +134,8 @@ class CityProvision(BaseMethod):
             for service_type in service_types
         }
 
-        print(self.buildings)
-        self.buildings.to_file("self.buildings000.geojson")
+        # print(self.buildings)
+        # self.buildings.to_file("self.buildings000.geojson")
         # Bad interface , raise error must be
         if user_changes_services:
             self.user_changes_services = (
@@ -253,14 +253,16 @@ class CityProvision(BaseMethod):
 
             try:
                 # 1/0
+                # if self.year != 2023:
+                #     1/0
                 self.Provisions[service_type]["services"] = pd.read_pickle(
-                    '/home/gk/code/CITY_GEO_TOOLS_DOCKER/CityGeoTools/metrics/services.pkl'
-                    # io.BytesIO(
-                    #     requests.get(
-                    #         f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_services",
-                    #         timeout=600,
-                    #     ).content
-                    # )
+                    # '/var/essdata/IDU/gkontsevik/CityGeoTools/local_cgt/local_cgt/metrics/services.pkl'
+                    io.BytesIO(
+                        requests.get(
+                            f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_services_new",
+                            timeout=600,
+                        ).content
+                    )
                 )
                 self.Provisions[service_type]["services"].dropna(
                     subset=["building_id"], inplace=True
@@ -272,142 +274,142 @@ class CityProvision(BaseMethod):
                 # self.Provisions[service_type]["services"].to_file('services00.geojson')
 
                 self.Provisions[service_type]["buildings"] = pd.read_pickle(
-                    '/home/gk/code/CITY_GEO_TOOLS_DOCKER/CityGeoTools/metrics/buildings.pkl'
-                    # io.BytesIO(
-                    #     requests.get(
-                    #         f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_buildings",
-                    #         timeout=600,
-                    #     ).content
-                    # )
+                    # '/var/essdata/IDU/gkontsevik/CityGeoTools/local_cgt/local_cgt/metrics/buildings.pkl'
+                    io.BytesIO(
+                        requests.get(
+                            f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_buildings_new",
+                            timeout=600,
+                        ).content
+                    )
                 )
 
-                if self.city_name != 'saint-petersburg':
-                    new_building_ids = pd.read_sql(
-                        f"select building_id as id, functional_object_id from all_buildings "
-                        f"where functional_object_id in {tuple(self.Provisions[service_type]['buildings']['functional_object_id'].values)}",
-                        con=self.engine,
-                    )
-                    self.Provisions[service_type]["buildings"] = self.Provisions[
-                        service_type
-                    ]["buildings"].join(new_building_ids.set_index("functional_object_id"))
-                    self.Provisions[service_type]["buildings"].dropna(
-                        subset=["id"], inplace=True
-                    )
+                # if self.city_name != 'saint-petersburg':
+                #     new_building_ids = pd.read_sql(
+                #         f"select building_id as id, functional_object_id from all_buildings "
+                #         f"where functional_object_id in {tuple(self.Provisions[service_type]['buildings']['functional_object_id'].values)}",
+                #         con=self.engine,
+                #     )
+                #     self.Provisions[service_type]["buildings"] = self.Provisions[
+                #         service_type
+                #     ]["buildings"].join(new_building_ids.set_index("functional_object_id"))
+                #     self.Provisions[service_type]["buildings"].dropna(
+                #         subset=["id"], inplace=True
+                #     )
                 self.Provisions[service_type]["buildings"]["id"] = self.Provisions[
                     service_type
                 ]["buildings"]["id"].astype(int)
                 
-                if self.city_name != 'saint-petersburg':
-                    col_to_rename_map = self.Provisions[service_type]["buildings"][
-                        "id"
-                    ].to_dict()
-                    rows_to_rename_map = self.Provisions[service_type]["services"][
-                        "building_id"
-                    ].to_dict()
+                # if self.city_name != 'saint-petersburg':
+                #     col_to_rename_map = self.Provisions[service_type]["buildings"][
+                #         "id"
+                #     ].to_dict()
+                #     rows_to_rename_map = self.Provisions[service_type]["services"][
+                #         "building_id"
+                #     ].to_dict()
 
                 self.Provisions[service_type]["distance_matrix"] = pd.read_pickle(
-                    '/home/gk/code/CITY_GEO_TOOLS_DOCKER/CityGeoTools/metrics/distm.pkl'
-                    # io.BytesIO(
-                    #     requests.get(
-                    #         f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_distance_matrix",
-                    #         timeout=600,
-                    #     ).content
-                    # )
+                    # '/var/essdata/IDU/gkontsevik/CityGeoTools/local_cgt/local_cgt/metrics/distm.pkl'
+                    io.BytesIO(
+                        requests.get(
+                            f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_distance_matrix_new",
+                            timeout=600,
+                        ).content
+                    )
                 )
-                if self.city_name != 'saint-petersburg':
-                    mask = self.Provisions[service_type]["distance_matrix"].index.isin(
-                        self.Provisions[service_type]["services"]["id"]
-                    )
-                    self.Provisions[service_type]["distance_matrix"] = self.Provisions[
-                        service_type
-                    ]["distance_matrix"].loc[
-                        self.Provisions[service_type]["distance_matrix"].index[mask], :
-                    ]
+                # if self.city_name != 'saint-petersburg':
+                #     mask = self.Provisions[service_type]["distance_matrix"].index.isin(
+                #         self.Provisions[service_type]["services"]["id"]
+                #     )
+                #     self.Provisions[service_type]["distance_matrix"] = self.Provisions[
+                #         service_type
+                #     ]["distance_matrix"].loc[
+                #         self.Provisions[service_type]["distance_matrix"].index[mask], :
+                #     ]
 
-                print(self.Provisions[service_type]["distance_matrix"])
+                # print(self.Provisions[service_type]["distance_matrix"])
 
-                if self.city_name != 'saint-petersburg':
-                    mask = self.Provisions[service_type]["distance_matrix"].columns.isin(
-                        self.Provisions[service_type]["buildings"]["functional_object_id"]
-                    )
-                # else:
+                # if self.city_name != 'saint-petersburg':
+                #     mask = self.Provisions[service_type]["distance_matrix"].columns.isin(
+                #         self.Provisions[service_type]["buildings"]["functional_object_id"]
+                #     )
+                # # else:
                 #     mask = self.Provisions[service_type]["distance_matrix"].columns.isin(
                 #         self.Provisions[service_type]["buildings"]["id"]
                 #     )
 
-                if self.city_name != 'saint-petersburg':
-                    self.Provisions[service_type]["distance_matrix"] = self.Provisions[
-                        service_type
-                    ]["distance_matrix"].loc[
-                        :, self.Provisions[service_type]["distance_matrix"].columns[mask]
-                    ]
+                # if self.city_name != 'saint-petersburg':
+                #     self.Provisions[service_type]["distance_matrix"] = self.Provisions[
+                #         service_type
+                #     ]["distance_matrix"].loc[
+                #         :, self.Provisions[service_type]["distance_matrix"].columns[mask]
+                #     ]
 
-                if self.city_name != 'saint-petersburg':
+                # if self.city_name != 'saint-petersburg':
 
-                    self.Provisions[service_type]["distance_matrix"].rename(
-                        mapper=col_to_rename_map, axis=1, inplace=True
-                    )
-                    self.Provisions[service_type]["distance_matrix"].rename(
-                        mapper=rows_to_rename_map, axis=0, inplace=True
-                    )
+                #     self.Provisions[service_type]["distance_matrix"].rename(
+                #         mapper=col_to_rename_map, axis=1, inplace=True
+                #     )
+                #     self.Provisions[service_type]["distance_matrix"].rename(
+                #         mapper=rows_to_rename_map, axis=0, inplace=True
+                #     )
 
                 self.Provisions[service_type]["destination_matrix"] = pd.read_pickle(
-                                        '/home/gk/code/CITY_GEO_TOOLS_DOCKER/CityGeoTools/metrics/destm.pkl'
-                    # io.BytesIO(
-                    #     requests.get(
-                    #         f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_destination_matrix",
-                    #         timeout=600,
-                    #     ).content
-                    # )
+                                        # '/var/essdata/IDU/gkontsevik/CityGeoTools/local_cgt/local_cgt/metrics/destm.pkl'
+                    io.BytesIO(
+                        requests.get(
+                            f"{self.file_server}provision_1/{self.city_name}_{service_type}_{self.year}_{self.valuation_type}_destination_matrix_new",
+                            timeout=600,
+                        ).content
+                    )
                 )
-                if self.city_name != 'saint-petersburg':
+                # if self.city_name != 'saint-petersburg':
 
-                    mask = self.Provisions[service_type]["destination_matrix"].index.isin(
-                        self.Provisions[service_type]["services"]["id"]
-                    )
-                    self.Provisions[service_type]["destination_matrix"] = self.Provisions[
-                        service_type
-                    ]["destination_matrix"].loc[
-                        self.Provisions[service_type]["destination_matrix"].index[mask], :
-                    ]
+                #     mask = self.Provisions[service_type]["destination_matrix"].index.isin(
+                #         self.Provisions[service_type]["services"]["id"]
+                #     )
+                #     self.Provisions[service_type]["destination_matrix"] = self.Provisions[
+                #         service_type
+                #     ]["destination_matrix"].loc[
+                #         self.Provisions[service_type]["destination_matrix"].index[mask], :
+                #     ]
 
-                if self.city_name != 'saint-petersburg':
-                    mask = self.Provisions[service_type]["destination_matrix"].columns.isin(
-                        self.Provisions[service_type]["buildings"]["functional_object_id"]
-                    )
-                else:
-                    mask = self.Provisions[service_type]["destination_matrix"].columns.isin(
-                        self.Provisions[service_type]["buildings"]["id"]
+                # if self.city_name != 'saint-petersburg':
+                #     mask = self.Provisions[service_type]["destination_matrix"].columns.isin(
+                #         self.Provisions[service_type]["buildings"]["functional_object_id"]
+                #     )
+                # else:
+                mask = self.Provisions[service_type]["destination_matrix"].columns.isin(
+                    self.Provisions[service_type]["buildings"]["id"]
                     )
                 self.Provisions[service_type]["destination_matrix"] = self.Provisions[
                     service_type
                 ]["destination_matrix"].loc[
                     :, self.Provisions[service_type]["destination_matrix"].columns[mask]
                 ]
-                if self.city_name != 'saint-petersburg':
+                # if self.city_name != 'saint-petersburg':
 
-                    self.Provisions[service_type]["destination_matrix"].rename(
-                        mapper=col_to_rename_map, axis=1, inplace=True
-                    )
-                    self.Provisions[service_type]["destination_matrix"].rename(
-                        mapper=rows_to_rename_map, axis=0, inplace=True
-                    )
+                #     self.Provisions[service_type]["destination_matrix"].rename(
+                #         mapper=col_to_rename_map, axis=1, inplace=True
+                #     )
+                #     self.Provisions[service_type]["destination_matrix"].rename(
+                #         mapper=rows_to_rename_map, axis=0, inplace=True
+                #     )
 
-                    self.Provisions[service_type]["services"].reset_index(
-                        drop=True, inplace=True
-                )
-                    # self.Provisions[service_type]["services"].rename(
-                    #     columns={"id": "functional_object_id"}, inplace=True
-                    # )
+                #     self.Provisions[service_type]["services"].reset_index(
+                #         drop=True, inplace=True
+                # )
+                #     # self.Provisions[service_type]["services"].rename(
+                #     #     columns={"id": "functional_object_id"}, inplace=True
+                #     # )
 
-                    self.Provisions[service_type]["services"][
-                        "functional_object_id"
-                    ] = self.Provisions[service_type]["services"]["id"]
-                    # self.Provisions[service_type]["services"].rename(
-                    #     columns={"building_id": "id"}, inplace=True
-                    # )
+                #     self.Provisions[service_type]["services"][
+                #         "functional_object_id"
+                #     ] = self.Provisions[service_type]["services"]["id"]
+                #     # self.Provisions[service_type]["services"].rename(
+                #     #     columns={"building_id": "id"}, inplace=True
+                #     # )
 
-                print(self.Provisions[service_type]["services"])
+                # print(self.Provisions[service_type]["services"])
 
                 # mask = self.Provisions[service_type]["services"]["building_id"].isin(
                 #     self.Provisions[service_type]["buildings"]["id"]
@@ -423,8 +425,8 @@ class CityProvision(BaseMethod):
                     service_type
                 ]["buildings"]["id"].values.astype(int)
 
-                print(self.Provisions[service_type]["services"])
-                self.Provisions[service_type]["services"].to_file("services01.geojson")
+                # print(self.Provisions[service_type]["services"])
+                # self.Provisions[service_type]["services"].to_file("services01.geojson")
                 print(service_type + " loaded")
             except Exception as ex:
                 print(ex)
@@ -461,8 +463,8 @@ class CityProvision(BaseMethod):
         ]
         self.buildings = self.buildings.drop(columns=cols_to_drop)
 
-        print(self.Provisions["kindergartens"]["buildings"])
-        print(self.buildings)
+        # print(self.Provisions["kindergartens"]["buildings"])
+        # print(self.buildings)
         # self.Provisions['kindergartens']["buildings"].to_file('self.Provisions[service_type]["buildings"].geojson')
         # self.buildings.to_file('self.buildings.geojson')
 
@@ -470,8 +472,8 @@ class CityProvision(BaseMethod):
             self.buildings = self.buildings.merge(
                 self.Provisions[service_type]["buildings"], left_on="id", right_on="id"
             )
-        print(self.buildings)
-        self.buildings.to_file("self.buildings2.geojson")
+        # print(self.buildings)
+        # self.buildings.to_file("self.buildings2.geojson")
 
         to_rename_x = [x for x in self.buildings.columns if "_x" in x]
         to_rename_y = [x for x in self.buildings.columns if "_y" in x]
@@ -497,7 +499,7 @@ class CityProvision(BaseMethod):
             self.buildings, self.services, self.Provisions
         )
 
-        self.services.to_file("self.services01.geojson")
+        # self.services.to_file("self.services01.geojson")
 
         self.buildings = self._provisions_impotancy(self.buildings)
         self.buildings = self.buildings.fillna(0)
@@ -560,8 +562,8 @@ class CityProvision(BaseMethod):
     def _is_shown(self, buildings, services, Provisions):
         if self.user_selection_zone:
             buildings["is_shown"] = buildings.within(self.user_selection_zone)
-            buildings.to_file("buildings.geojson")
-            services.to_file("services.geojson")
+            # buildings.to_file("buildings.geojson")
+            # services.to_file("services.geojson")
             # Provisions[service_type]["destination_matrix"].to_csv('Provisions[service_type]["destination_matrix"].csv')
             a = buildings["is_shown"].copy()
             t = []
@@ -614,7 +616,7 @@ class CityProvision(BaseMethod):
 
         Provisions["distance_matrix"].index = Provisions["services"].index
         Provisions["distance_matrix"].columns = Provisions["buildings"].index
-        Provisions["distance_matrix"].to_pickle('distm.pkl')
+        # Provisions["distance_matrix"].to_pickle('distm.pkl')
         Provisions["destination_matrix"] = pd.DataFrame(
             0,
             index=Provisions["distance_matrix"].index,
@@ -651,7 +653,7 @@ class CityProvision(BaseMethod):
                 service_type,
             )
 
-        Provisions["destination_matrix"].to_pickle('destm.pkl')
+        # Provisions["destination_matrix"].to_pickle('destm.pkl')
         return Provisions
 
     @staticmethod
@@ -740,8 +742,8 @@ class CityProvision(BaseMethod):
             [x for x in buildings.columns if service_type in x] + ["id"]
         ]
 
-        buildings.to_pickle('buildings.pkl')
-        services.to_pickle('services.pkl')
+        # buildings.to_pickle('buildings.pkl')
+        # services.to_pickle('services.pkl')
 
         return buildings, services
 
@@ -971,7 +973,7 @@ class CityProvision(BaseMethod):
                 )
             )
 
-        print(destination_matrix,buildings,services)
+        # print(destination_matrix,buildings,services)
 
         buildings.geometry = buildings.centroid
         services.geometry = services.centroid
@@ -979,21 +981,21 @@ class CityProvision(BaseMethod):
             lambda x: subfunc(x[x > 0]), result_type="reduce"
         )
 
-        print(flat_matrix)
-        flat_matrix.to_pickle('flat_matrix.pkl')
+        # print(flat_matrix)
+        # flat_matrix.to_pickle('flat_matrix.pkl')
 
         distribution_links = gpd.GeoDataFrame(
             data=[item for sublist in list(flat_matrix) for item in sublist]
         )
 
-        print(distribution_links)
+        # print(distribution_links)
 
         sel = distribution_links["building_id"].isin(
             buildings["id"].values
         ) & distribution_links["service_id"].isin(services["id"].values)
         sel = distribution_links.loc[sel[sel].index.values]
 
-        print(sel)
+        # print(sel)
 
         distribution_links["geometry"] = sel.apply(lambda x: subfunc_geom(x), axis=1)
         return distribution_links
@@ -1051,7 +1053,7 @@ class CityProvision(BaseMethod):
             try:
                 to_df[int(t[1])].update({int(t[2]): var.value()})
             except ValueError:
-                print(t)
+                # print(t)
                 pass
             except:
                 to_df[int(t[1])] = {int(t[2]): var.value()}
