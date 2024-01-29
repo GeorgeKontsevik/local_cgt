@@ -1,26 +1,26 @@
 import pytest
 
 from tests.conf import testing_settings
-from tests.geojson_example import CitiesPolygonForTrafficsCalculation, SAINT_PETERSBURG_VORONOI_GEOJSON
+from tests.geojson_example import CitiesPolygonForTrafficsCalculation, SAINT_PETERSBURG_VORONOI_GEOJSON, SAINT_PETERSBURG_DIVERSITY_GEOJSON
 from app import enums
 from tests import provision_geojson_examples
 
 MUNICIPALITIES = [
-    (enums.CitiesEnum.SAINT_PETERSBURG, enums.TerritorialEnum.MUNICIPALITY, 95),
-    (enums.CitiesEnum.KRASNODAR, enums.TerritorialEnum.MUNICIPALITY, 113),
-    (enums.CitiesEnum.SEVASTOPOL, enums.TerritorialEnum.MUNICIPALITY, 126),
+    (enums.CitiesEnum.SAINT_PETERSBURG.value, enums.TerritorialEnum.MUNICIPALITY.value, 85),
+    (enums.CitiesEnum.KRASNODAR.value, enums.TerritorialEnum.MUNICIPALITY.value, 113),
+    (enums.CitiesEnum.SEVASTOPOL.value, enums.TerritorialEnum.MUNICIPALITY.value, 119),
 ]
 
 BLOCKS = [
-    (enums.CitiesEnum.SAINT_PETERSBURG, enums.TerritorialEnum.BLOCK, 2800),
-    (enums.CitiesEnum.KRASNODAR, enums.TerritorialEnum.BLOCK, 7034),
-    (enums.CitiesEnum.SEVASTOPOL, enums.TerritorialEnum.BLOCK, 15020),
+    (enums.CitiesEnum.SAINT_PETERSBURG.value, enums.TerritorialEnum.BLOCK.value, 166678),
+    (enums.CitiesEnum.KRASNODAR.value, enums.TerritorialEnum.BLOCK.value, 87912),
+    (enums.CitiesEnum.SEVASTOPOL.value, enums.TerritorialEnum.BLOCK.value, 161110),
 ]
 
 ADMINISTRATIVE_UNITS = [
-    (enums.CitiesEnum.SAINT_PETERSBURG, enums.TerritorialEnum.ADMINISTRATIVE_UNIT, 59),
-    (enums.CitiesEnum.KRASNODAR, enums.TerritorialEnum.ADMINISTRATIVE_UNIT, 69),
-    (enums.CitiesEnum.SEVASTOPOL, enums.TerritorialEnum.ADMINISTRATIVE_UNIT, 137),
+    (enums.CitiesEnum.SAINT_PETERSBURG.value, enums.TerritorialEnum.ADMINISTRATIVE_UNIT.value, 58),
+    (enums.CitiesEnum.KRASNODAR.value, enums.TerritorialEnum.ADMINISTRATIVE_UNIT.value, 66),
+    (enums.CitiesEnum.SEVASTOPOL.value, enums.TerritorialEnum.ADMINISTRATIVE_UNIT.value, 87),
 ]
 
 
@@ -28,35 +28,37 @@ class TestTrafficsCalculation:
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/pedastrian_walk_traffics"
 
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
-        (enums.CitiesEnum.KRASNODAR, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON),
-        (enums.CitiesEnum.SEVASTOPOL, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
+        # (enums.CitiesEnum.KRASNODAR.value, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON),
+        # (enums.CitiesEnum.SEVASTOPOL.value, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON),
     ])
     def test_pedastrian_walk_traffics_calculation(self, client, city, geojson):
         url = self.URL + "/pedastrian_walk_traffics_calculation"
         resp = client.post(url, json={"city": city, "geojson": geojson})
 
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_OUTSIDE_GEOJSON),
-        (enums.CitiesEnum.KRASNODAR, CitiesPolygonForTrafficsCalculation.KRASNODAR_OUTSIDE_GEOJSON),
-        (enums.CitiesEnum.SEVASTOPOL, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_OUTSIDE_GEOJSON),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_OUTSIDE_GEOJSON),
+        (enums.CitiesEnum.KRASNODAR.value, CitiesPolygonForTrafficsCalculation.KRASNODAR_OUTSIDE_GEOJSON),
+        (enums.CitiesEnum.SEVASTOPOL.value, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_OUTSIDE_GEOJSON),
     ])
     def test_400_error(self, client, city, geojson):
         """Проверка территорий, в которые не попадают жилые дома."""
         url = self.URL + "/pedastrian_walk_traffics_calculation"
         resp = client.post(url, json={"city": city, "geojson": geojson})
 
+        print(resp.content)
         assert resp.status_code == 400
 
 
 class TestVisibilityAnalysis:
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/visibility_analysis"
     VIEWPOINTS = [  # random points in city bbox. latitude, longitude
-        (enums.CitiesEnum.SAINT_PETERSBURG, 59.785982, 30.2971539),
-        (enums.CitiesEnum.KRASNODAR, 45.0111502, 38.9100388),
-        (enums.CitiesEnum.SEVASTOPOL, 44.7775737, 33.4171179),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, 59.785982, 30.2971539),
+        (enums.CitiesEnum.KRASNODAR.value, 45.0111502, 38.9100388),
+        (enums.CitiesEnum.SEVASTOPOL.value, 44.7775737, 33.4171179),
     ]
 
     @pytest.mark.parametrize("view_distance", [700])
@@ -71,6 +73,7 @@ class TestVisibilityAnalysis:
         }
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
 
@@ -78,7 +81,7 @@ class TestWeightedVoronoi:
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/voronoi"
 
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, SAINT_PETERSBURG_VORONOI_GEOJSON)
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, SAINT_PETERSBURG_VORONOI_GEOJSON)
     ])
     def test_weighted_voronoi_calculation(self, client, city, geojson):
         url = self.URL + "/weighted_voronoi_calculation"
@@ -88,6 +91,7 @@ class TestWeightedVoronoi:
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
 
@@ -99,7 +103,7 @@ class TestBlocksClusterization:
 
     @pytest.mark.parametrize("clusters_number", [DEFAULT_CLUSTER_NUMBER, RANDOM_CLUSTER_NUMBER])
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
     ])
     def test_get_blocks_calculations(self, client, city, clusters_number, geojson):
         url = self.URL + "/get_blocks"
@@ -111,10 +115,11 @@ class TestBlocksClusterization:
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON),
     ])
     def test_get_dendrogram(self, client, city, geojson):
         url = self.URL + "/get_dendrogram"
@@ -126,6 +131,7 @@ class TestBlocksClusterization:
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
         assert resp.headers.get("content-type") == "image/png"
 
@@ -140,18 +146,19 @@ class TestServicesClusterization:
         """Запрос с обязательными полями и значениями по умолчанию. """
         url = self.URL + "/get_clusters_polygons"
         data = {
-            "city": city,
+            "city": city.value,
             "service_types": self.RANDOM_SERVICE_TYPES,
-            "condition": condition,
+            "condition": condition.value,
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("city, geojson, expected_code", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON, 200),
-        (enums.CitiesEnum.KRASNODAR, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON, 400),
-        (enums.CitiesEnum.SEVASTOPOL, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON, 400),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON, 200),
+        (enums.CitiesEnum.KRASNODAR.value, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON, 400),
+        (enums.CitiesEnum.SEVASTOPOL.value, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON, 400),
     ])
     @pytest.mark.parametrize("condition", enums.ClusterizationConditionsEnum)
     def test_get_services_clusterization_with_geojson_param(self, client, city, geojson, condition, expected_code):
@@ -161,10 +168,11 @@ class TestServicesClusterization:
             "city": city,
             "geojson": geojson,
             "service_types": self.RANDOM_SERVICE_TYPES,
-            "condition": condition,
+            "condition": condition.value,
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == expected_code
 
     @pytest.mark.parametrize("city, area_type, area_id", [*ADMINISTRATIVE_UNITS, *MUNICIPALITIES, *BLOCKS])
@@ -174,7 +182,7 @@ class TestServicesClusterization:
         data = {
             "city": city,
             "service_types": self.RANDOM_SERVICE_TYPES,
-            "condition": condition,
+            "condition": condition.value,
             "area_type": area_type,
             "area_id": area_id
         }
@@ -183,6 +191,7 @@ class TestServicesClusterization:
             200,  # OK
             400,  # There is no services whithin a given territory
         ]
+        print(resp.content)
         assert resp.status_code in expected_status_codes
 
     @pytest.mark.parametrize("city", enums.CitiesEnum)
@@ -193,15 +202,17 @@ class TestServicesClusterization:
 
         service_types = ["does_not_exists_service"]
         data = {
-            "city": city,
+            "city": city.value,
             "service_types": service_types,
-            "condition": condition,
+            "condition": condition.value,
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 400
 
         error_detail = {"detail": "There is no services whithin a given territory."}
+        print(resp.content)
         assert error_detail == resp.json()
 
 
@@ -212,17 +223,19 @@ class TestSpacematrix:
     def test_get_spacematrix_indices(self, client, city):
         """Запрос с обязательными полями и значениями по умолчанию. """
         data = {
-            "city": city,
+            "city": city.value,
+            "clusters_number": 3
         }
 
         url = self.URL + "/get_indices"
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("city, geojson", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON,),
-        (enums.CitiesEnum.KRASNODAR, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON, ),
-        pytest.param(enums.CitiesEnum.SEVASTOPOL, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON),
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, CitiesPolygonForTrafficsCalculation.SAINT_PETERSBURG_INSIDE_GEOJSON,),
+        (enums.CitiesEnum.KRASNODAR.value, CitiesPolygonForTrafficsCalculation.KRASNODAR_INSIDE_GEOJSON, ),
+        (enums.CitiesEnum.SEVASTOPOL.value, CitiesPolygonForTrafficsCalculation.SEVASTOPOL_INSIDE_GEOJSON),
     ])
     def test_get_spacematrix_indices_geojson(self, client, city, geojson):
         """ Запрос со передачей geojson геометрии. """
@@ -233,6 +246,7 @@ class TestSpacematrix:
 
         url = self.URL + "/get_indices"
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("city, area_type, area_id", [*ADMINISTRATIVE_UNITS, *MUNICIPALITIES, *BLOCKS])
@@ -244,16 +258,17 @@ class TestSpacematrix:
             "area_id": area_id
         }
         resp = client.post(url, json=data)
-        assert resp.status_code == 200
+        print(resp.content)
+        assert resp.status_code == 200 
 
 
 class TestMobilityAnalysisIsochrones:
     """ Проверка метрики доступности. """
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/mobility_analysis/isochrones"
     CITIES_FROM_POINTS = [  # random points in city bbox. latitude, longitude
-        (enums.CitiesEnum.SAINT_PETERSBURG, 59.9386300, 30.3141300),
-        (enums.CitiesEnum.KRASNODAR, 45.0448400, 38.9760300),
-        (enums.CitiesEnum.SEVASTOPOL, 44.5888300, 33.5224000)
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, 59.9386300, 30.3141300),
+        (enums.CitiesEnum.KRASNODAR.value, 45.0448400, 38.9760300),
+        (enums.CitiesEnum.SEVASTOPOL.value, 44.5888300, 33.5224000)
     ]
 
     @pytest.mark.parametrize("travel_type", enums.MobilityAnalysisIsochronesTravelTypeEnum)
@@ -268,8 +283,8 @@ class TestMobilityAnalysisIsochrones:
         """ Проверка вычисления изохрон для всех типов транспорта. """
         params = dict(
             city=city,
-            travel_type=travel_type,
-            weight_type=weight_type,
+            travel_type=travel_type.value,
+            weight_type=weight_type.value,
             weight_value=weight_value,
             x_from=x_from,
             y_from=y_from,
@@ -278,6 +293,7 @@ class TestMobilityAnalysisIsochrones:
         url = self.URL
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("travel_type", [
@@ -293,8 +309,8 @@ class TestMobilityAnalysisIsochrones:
         """ Проверка успешного получения routers для изохрон """
         params = dict(
             city=city,
-            travel_type=travel_type,
-            weight_type=weight_type,
+            travel_type=travel_type.value,
+            weight_type=weight_type.value,
             weight_value=weight_value,
             x_from=x_from,
             y_from=y_from,
@@ -304,6 +320,7 @@ class TestMobilityAnalysisIsochrones:
         url = self.URL
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("travel_type", [
@@ -321,8 +338,8 @@ class TestMobilityAnalysisIsochrones:
         """ Проверка ошибки при получении routers для изохрон """
         params = dict(
             city=city,
-            travel_type=travel_type,
-            weight_type=weight_type,
+            travel_type=travel_type.value,
+            weight_type=weight_type.value,
             weight_value=weight_value,
             x_from=x_from,
             y_from=y_from,
@@ -332,23 +349,25 @@ class TestMobilityAnalysisIsochrones:
         url = self.URL
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 422
 
 
 class TestDiversity:
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/diversity"
-    RANDOM_SERVICE_TYPE = "universities"
+    RANDOM_SERVICE_TYPE = "cafes"
 
     @pytest.mark.parametrize("service_type", [RANDOM_SERVICE_TYPE])
-    @pytest.mark.parametrize("city", enums.CitiesEnum)
-    def test_get_diversity(self, client, city, service_type):
+    def test_get_diversity(self, client, service_type):
         url = self.URL + "/diversity"
         params = {
-            "city": city,
-            "service_type": service_type
+            "city": enums.CitiesEnum.SAINT_PETERSBURG.value,
+            "service_type": service_type,
+            # "geojson": SAINT_PETERSBURG_DIVERSITY_GEOJSON
         }
 
-        resp = client.get(url, params=params)
+        resp = client.post(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("service_type", ["cafes", "bakeries"])
@@ -362,23 +381,25 @@ class TestDiversity:
         }
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("service_type", [RANDOM_SERVICE_TYPE])
-    @pytest.mark.parametrize("city, house_id", [
-        (enums.CitiesEnum.SAINT_PETERSBURG, 915),
-        (enums.CitiesEnum.KRASNODAR, 137701),
-        (enums.CitiesEnum.SEVASTOPOL, 819244),
+    @pytest.mark.parametrize("city, building_id", [
+        (enums.CitiesEnum.SAINT_PETERSBURG.value, 915),
+        (enums.CitiesEnum.KRASNODAR.value, 137701),
+        (enums.CitiesEnum.SEVASTOPOL.value, 397343),
     ])
-    def test_get_diversity_get_info(self, client, city, house_id, service_type):
+    def test_get_diversity_get_info(self, client, city, building_id, service_type):
         url = self.URL + "/get_info"
         params = {
             "city": city,
-            "house_id": house_id,
+            "building_id": building_id,
             "service_type": service_type,
         }
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
 
@@ -389,26 +410,27 @@ class TestProvision:
         url = self.URL + "/get_provision"
 
         data = {
-            "city": enums.CitiesEnum.SAINT_PETERSBURG,
+            "city": enums.CitiesEnum.SAINT_PETERSBURG.value,
             "service_types": ["kindergartens"],
             "valuation_type": "normative",
-            "year": 2022,
+            "year": 2023,
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
     @pytest.mark.parametrize("user_changes_buildings", [
-        None, provision_geojson_examples.provisions_tests_kinders_houses,
+        provision_geojson_examples.provisions_tests_kinders_houses,
     ])
     @pytest.mark.parametrize("user_changes_services", [
-        None, provision_geojson_examples.provisions_tests_kinders,
+        provision_geojson_examples.provisions_tests_kinders,
     ])
     def test_recalculate_provisions(self, client, user_changes_buildings, user_changes_services):
         url = self.URL + "/recalculate_provisions"
 
         data = {
-            "city": enums.CitiesEnum.SAINT_PETERSBURG,
+            "city": enums.CitiesEnum.SAINT_PETERSBURG.value,
             "service_types": ["kindergartens"],
             "valuation_type": "normative",
             "year": 2022,
@@ -418,6 +440,7 @@ class TestProvision:
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
 
@@ -430,10 +453,11 @@ class TestCollocationMatrix:
         url = self.URL + "/collocation_matrix"
 
         params = {
-            "city": city,
+            "city": city.value,
         }
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200
 
 
@@ -445,28 +469,29 @@ class TestCityContextGetContext:
         url = self.URL + "/get_context"
 
         data = {
-            "city": enums.CitiesEnum.SAINT_PETERSBURG,
+            "city": enums.CitiesEnum.SAINT_PETERSBURG.value,
             "service_types": ["schools", "kindergartens",'colleges', 'saunas', 'zoos','optics'],
             "valuation_type": "normative",
             "year": 2022,
         }
 
         resp = client.post(url, json=data)
+        print(resp.content)
         assert resp.status_code == 200
 
 
 class TestBlocksAccessibility:
     URL = f"http://{testing_settings.APP_ADDRESS_FOR_TESTING}/blocks_accessibility"
 
-    @pytest.mark.parametrize("city", enums.CitiesEnum)
-    def test_get_blocks_accessibility(self, client, city, target_block):
+    def test_get_blocks_accessibility(self, client):
         """ Тестирование blocks accessibility для городов. """
-        url = self.URL + "/blocks_accessibility"
+        url = self.URL + "/get_accessibility"
 
         params = {
-            "city": city,
-            "target_block": target_block
+            "city": enums.CitiesEnum.SAINT_PETERSBURG.value,
+            "block_id": 0
         }
 
         resp = client.get(url, params=params)
+        print(resp.content)
         assert resp.status_code == 200

@@ -8,8 +8,12 @@ RUN apt-get update && apt-get -qq -y install curl
 RUN apt-get update && apt-get -qq -y install netcat
 RUN apt-get update && apt-get -y install libspatialindex-dev
 RUN python -m pip install --upgrade pip
+
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 EXPOSE 18861
+
+
 
 CMD ["python", "-u", "rpyc_server.py"]

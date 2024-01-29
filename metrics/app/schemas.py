@@ -291,11 +291,11 @@ class DiversityOut(BaseModel):
 class DiversityGetInfoQueryParams:
     def __init__(self,
                  city: enums.CitiesEnum,
-                 house_id: int = Query(..., example=45793),
+                 building_id: int = Query(..., example=45793),
                  service_type: str = Query(..., example="cafes")
                  ):
         self.city = city
-        self.house_id = house_id
+        self.building_id = building_id
         self.service_type = service_type
 
 
@@ -320,7 +320,7 @@ class DiversityGetBuildingsQueryParams:
 
 class ProvisionInBase(BaseModel):
     """Базовый класс схемы входных параметров для обеспеченности. """
-    city: str
+    city: enums.CitiesEnum
     service_types: conlist(str, min_items=1)
     valuation_type: str
     year: int
@@ -337,7 +337,7 @@ class ProvisionGetProvisionIn(ProvisionInBase):
                 "city": "saint-petersburg",
                 "service_types": ["kindergartens"],
                 "valuation_type": "normative",
-                "year": 2022,
+                "year": 2023,
             }
         }
 
@@ -360,7 +360,7 @@ class CityContextGetContextIn(ProvisionInBase):
                 "city": "saint-petersburg",
                 "service_types": ["schools", "kindergartens", 'colleges', 'saunas', 'zoos', 'optics'],
                 "valuation_type": "normative",
-                "year": 2022,
+                "year": 2023,
             }
         }
 
@@ -374,7 +374,7 @@ class CityValuestGetValuesOut(BaseModel):
     city_values: dict[str,dict]
 
 class CityValuestGetValuesIn(BaseModel):
-    city: str
+    city: enums.CitiesEnum
     valuation_type: str
     year: int
 
@@ -563,7 +563,7 @@ class CoverageZonesIsochroneQueryParams:
 
 
 class DataUpdateIn(BaseModel):
-    city_name: str
+    city_name: enums.CitiesEnum
     attr_name: str
 
 
